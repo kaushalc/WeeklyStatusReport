@@ -1,0 +1,75 @@
+<html>
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.0/JSXTransformer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+</head>
+
+<body>
+<div id="master" />
+<script type="text/jsx">
+var EmailForm = React.createClass({
+  handleSubmit : function (e){
+    e.preventDefault();
+    var email = React.findDOMNode(this.refs.email).value.trim();
+    this.props.getUserTimesheet(email);
+  },
+  render: function(){
+    return(<form type="GET" action="/rest/employee" onSubmit={this.handleSubmit}>
+  <input type="text" placeholder="Enter email" ref="email" />
+  <input type="submit" />
+      </form>);
+  }
+})
+
+var UserTimesheets = React.createClass({
+
+    render: function(){
+      //get user object from state.data.
+      
+      return(
+        <div>
+
+        </div>
+      )
+    }
+
+})
+var TimeSheet = React.createClass({
+  getInitialState: function(){
+    return {};
+  },
+  getTimeSheet: function(email){
+    $.ajax({
+      url: '/rest/employee?email='+email,
+      dataType: 'json',
+      type: 'GET',
+      success: function(data) {
+        console.log(data)
+        this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  render: function(){
+    return(<div> Hello Decksters!!! Enter your email to contine
+      <EmailForm getUserTimesheet={this.getTimeSheet}/>
+      <UserTimesheets timeSheet={this.state.data}/>
+      </div>);
+  }
+
+})
+React.render(<TimeSheet />, document.getElementById('master'));
+</script>
+
+<!--
+<form method="GET" action="/rest/employee">
+  <input type="text" name="email" />
+  <input type="submit" />
+</form> -->
+</body>
+</html>

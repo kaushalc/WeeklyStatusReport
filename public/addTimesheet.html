@@ -1,0 +1,32 @@
+<html>
+<head>
+<script>
+    window.onload = function() {
+			var curr = new Date; // get current date
+			var first = curr.getDate() - curr.getDay()+1; // First day is the day of the month - the day of the week
+			var last = first + 5; // last day is the first day + 6
+
+			var firstday = new Date(curr.setDate(first)).toDateString();
+			var lastday = new Date(curr.setDate(last)).toDateString();
+
+      document.getElementById('week-start').value = firstday;
+      document.getElementById('week-end').value = lastday;
+    }
+</script>
+</head>
+
+<body>
+<form method="POST" action="/rest/timeSheet">
+	<input type="text" name="email" value="email"></input>
+	<br />
+	<input id="week-start" type="hidden" name="week-start"></input>
+ 	<input id="week-end" type="hidden" name="week-end"></input>
+	Enter tasks for this week <br />
+	<textarea name="tasks" rows="10" cols="50" value="tasks"></textarea>
+	<br />
+	<input type="submit"></input>
+
+</form>
+
+</body>
+</html>

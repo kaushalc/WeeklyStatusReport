@@ -1,0 +1,49 @@
+var express = require('express');
+var mysql = require('mysql');  //mysql setup 
+var connect = require('connect');
+var http = require('http');
+var port = 3000;
+var app = express();
+
+
+//Mysql db set up
+
+//var connection = mysql.createConnection({   host     : 'localhost',   user     : 'username',   password : 'secret_password',   database: 'database_name' });  connection.connect();
+app.use(express.static(__dirname + '/public'));
+app.use('/static', express.static(__dirname + '/public'));
+
+var bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+var router = express.Router();
+router.get('/projects', function(req,res){
+})
+router.post('/project', function(req,res){
+	//res.send("ADDED NEW PROJECT NAME "+projId+"::"+projectName);
+});
+router.post('/employee', function(req,res){
+        //res.send("ADDED NEW EMPLOEE NAME "+employeeName);
+});
+
+router.post('/timeSheet', function(req,res){
+	/*console.log("ADDING TIME SHEET");
+	var projId = req.body['projectid'];
+	var email = req.body['email'];
+	var hours = req.body['hours'];
+	var date = req.body['date'];
+	var tsId = Math.floor(Math.random()*9000) + 1000;
+	console.log(projId+"::"+email+"::"+hours);
+	console.log("ADDING TIME SHEET TO PROJECT "+projId);
+	ProjectModel.update({'id':projId},{'$push':{'timesheets':{'id':tsId,'employee':email,'date':date,'hours':hours}}},function(err,count,raw){if(err) throw(err); console.log("ADDED TIME SHEET ");});
+	console.log("ADDED TIME SHEET");
+	res.send("ADDED TIME SHEET");	*/	
+
+});
+router.get('/timesheet', function(req,res){
+
+})
+app.use('/rest', router);
+app.listen(port);
+console.log('Magic happens on port ' + port);
+
