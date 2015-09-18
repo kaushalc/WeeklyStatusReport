@@ -24,22 +24,71 @@ var EmailForm = React.createClass({
   }
 })
 
+//This is a form to add time sheet. It has one text box and a button.
+
+var AddTimesheet = React.createClass({
+    handleAddTimesheet: function(e){
+        e.preventDefault();
+        var email = this.state.email;
+        var tasks = React.findDOMNode(this.refs.tasks).value.trim();
+        this.props.addUserTimesheet(email,tasks);
+    },
+    render: function(){
+      <form method="post" action="/rest/timeSheet" onSubmit={this.handleAddTimesheet}>
+      <input type="text" placeholder="Enter last weeks tasks" ref="tasks" />
+      <input type="submit" />
+      </form>
+    }
+})
+var Timesheet = React.createClass({
+
+  render: function(){
+
+    return(<div style="border:1px solid black; float:left">
+    <b> {this.props.timesheet.start_date} TO {this.props.timesheet.end_date} </b>
+    <hr />
+    <p> {this.props.timesheet.tasks} </p>
+    </div>);
+  }
+})
 var UserTimesheets = React.createClass({
 
     render: function(){
       //get user object from state.data.
-      
-      return(
-        <div>
-
-        </div>
-      )
+      var timsheetNodes = this.props.data.timesheets.map(function (timesheet) {
+            return (
+              <Timesheet time_sheet={timesheet}>
+              </Timesheet>
+            );
+          });
+          return (
+            <div style="overflow: hidden;">
+              {timesheetNodes}
+            </div>
+          );
     }
-
 })
+//THis is the parent component of all other components so will have to the state.
 var TimeSheet = React.createClass({
   getInitialState: function(){
     return {};
+  },
+  addUserTimesheet: function(emailP,tasksP){
+    var lastweek = getLastweek();
+    $.ajax({
+      url: '/rest/timeSheet?email',
+      dataType: 'json',
+      type: 'POST',
+      data:{email:emailP,week_start:lastweek.start, week_end:lastweek.end,tasks:tasksP},
+      success: function(data) {
+        console.log(data)
+        this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+
   },
   getTimeSheet: function(email){
     $.ajax({
@@ -58,12 +107,24 @@ var TimeSheet = React.createClass({
   render: function(){
     return(<div> Hello Decksters!!! Enter your email to contine
       <EmailForm getUserTimesheet={this.getTimeSheet}/>
+      <AddTimesheet addUsetTimesheet={this.addUserTimesheet}/>
       <UserTimesheets timeSheet={this.state.data}/>
       </div>);
   }
 
 })
 React.render(<TimeSheet />, document.getElementById('master'));
+
+function getLastweek(){
+  var curr = new Date; // get current date
+  var first = curr.getDate() - curr.getDay()+1; // First day is the day of the month - the day of the week
+  var last = first + 5; // last day is the first day + 6
+
+  var firstday = new Date(curr.setDate(first)).toDateString();
+  var lastday = new Date(curr.setDate(last)).toDateString();
+  var lastweek ={start:firstday,end:lastday};
+  return lastweek;
+}
 </script>
 
 <!--

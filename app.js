@@ -75,8 +75,8 @@ router.get('/employees',function(req,res){
 router.post('/timeSheet', function(req,res){
 	console.log("ADDING TIME SHEET. NEW");
 	var email = req.body['email'];
-	var weekstart = req.body['week-start'];
-	var weekend  = req.body['week-end'];
+	var weekstart = req.body['week_start'];
+	var weekend  = req.body['week_end'];
 	var taskDetails= req.body['tasks'];
 	var tsId = Math.floor(Math.random()*9000) + 1000;
 	UserModel.update({'email':email},{'$push':{'timesheets':{'id':tsId,'start_date':weekstart,'end_date':weekend,'tasks':taskDetails}}},
