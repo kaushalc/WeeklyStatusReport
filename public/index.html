@@ -1,10 +1,14 @@
 <html>
 
 <head>
+  <script src="moment.min.js"></script>
+  <script src="card-depth.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.0/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.0/JSXTransformer.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -29,40 +33,55 @@ var EmailForm = React.createClass({
 var AddTimesheet = React.createClass({
     handleAddTimesheet: function(e){
         e.preventDefault();
-        var email = this.state.email;
+        var email = React.findDOMNode(this.refs.email).value.trim();//this.state.data.email;
         var tasks = React.findDOMNode(this.refs.tasks).value.trim();
         this.props.addUserTimesheet(email,tasks);
     },
     render: function(){
-      <form method="post" action="/rest/timeSheet" onSubmit={this.handleAddTimesheet}>
-      <input type="text" placeholder="Enter last weeks tasks" ref="tasks" />
-      <input type="submit" />
-      </form>
+      if(this.props.data.email==null || this.props.data.email=="")
+        return(<div />);
+      else
+          return(
+          <form method="post" action="/rest/timeSheet" onSubmit={this.handleAddTimesheet}>
+          <input type="hidden" value={this.props.data.email} ref="email" />
+          <textarea placeholder="Enter last weeks tasks" ref="tasks" />
+          <br />
+          <br />
+          <input type="submit" />
+          </form>
+        )
     }
 })
 var Timesheet = React.createClass({
 
   render: function(){
-
-    return(<div style="border:1px solid black; float:left">
-    <b> {this.props.timesheet.start_date} TO {this.props.timesheet.end_date} </b>
-    <hr />
-    <p> {this.props.timesheet.tasks} </p>
-    </div>);
+    var sd = new moment(this.props.time_sheet.start_date);
+    var fsd = sd.format("MMM Do YYYY");
+    var ed = new moment(this.props.time_sheet.end_date);
+    var fed = ed.format("MMM Do YYYY");
+    console.log("FSD IS "+fsd);
+    return(<div>
+    <p> {fsd} TO {fed} </p>
+    <p> {this.props.time_sheet.tasks} </p>
+    </div>
+    );
   }
 })
 var UserTimesheets = React.createClass({
 
     render: function(){
       //get user object from state.data.
-      var timsheetNodes = this.props.data.timesheets.map(function (timesheet) {
-            return (
-              <Timesheet time_sheet={timesheet}>
-              </Timesheet>
-            );
-          });
-          return (
-            <div style="overflow: hidden;">
+      console.log("RENDERING UserTimesheets")
+        timesheetNodes= this.props.timeSheet.timesheets.map(function (timesheet) {
+              return (
+                <div styleName="w3-card">
+                <Timesheet time_sheet={timesheet}>
+                </Timesheet>
+                </div>
+              );
+            });
+       return (
+            <div >
               {timesheetNodes}
             </div>
           );
@@ -71,7 +90,7 @@ var UserTimesheets = React.createClass({
 //THis is the parent component of all other components so will have to the state.
 var TimeSheet = React.createClass({
   getInitialState: function(){
-    return {};
+    return {data: {email:"",timesheets:[]}};
   },
   addUserTimesheet: function(emailP,tasksP){
     var lastweek = getLastweek();
@@ -85,7 +104,7 @@ var TimeSheet = React.createClass({
         this.setState({data: data});
       }.bind(this),
       error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
+        console.error(err.toString());
       }.bind(this)
     });
 
@@ -97,7 +116,11 @@ var TimeSheet = React.createClass({
       type: 'GET',
       success: function(data) {
         console.log(data)
+        console.log("BEFORE DATA FROM SERVER");
+        console.log(this.state);
+        console.log("GOT DATA FROM SERVER");
         this.setState({data: data});
+        console.log(this.state.data)
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -105,11 +128,17 @@ var TimeSheet = React.createClass({
     });
   },
   render: function(){
-    return(<div> Hello Decksters!!! Enter your email to contine
-      <EmailForm getUserTimesheet={this.getTimeSheet}/>
-      <AddTimesheet addUsetTimesheet={this.addUserTimesheet}/>
-      <UserTimesheets timeSheet={this.state.data}/>
-      </div>);
+    if(this.state.data.email=="")
+          return(<div> Hello Decksters!!! Enter your email to contine
+            <EmailForm getUserTimesheet={this.getTimeSheet}/>
+            </div>);
+    else
+          return(<div> Hello Decksters!!! Enter your email to contine
+            <EmailForm getUserTimesheet={this.getTimeSheet}/>
+            <p> Welcome {this.state.data.name} </p>
+            <AddTimesheet addUserTimesheet={this.addUserTimesheet} data={this.state.data}/>
+            <UserTimesheets timeSheet={this.state.data}/>
+            </div>);
   }
 
 })

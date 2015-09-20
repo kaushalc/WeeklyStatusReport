@@ -78,16 +78,24 @@ router.post('/timeSheet', function(req,res){
 	var weekstart = req.body['week_start'];
 	var weekend  = req.body['week_end'];
 	var taskDetails= req.body['tasks'];
+  console.log("PARAMS ARE "+email+"::"+weekstart+"::"+weekend+"::"+taskDetails)
 	var tsId = Math.floor(Math.random()*9000) + 1000;
 	UserModel.update({'email':email},{'$push':{'timesheets':{'id':tsId,'start_date':weekstart,'end_date':weekend,'tasks':taskDetails}}},
 			function(err,count,raw){
-				if(err) throw(err);
-				res.send("ADDED TIME SHEET");});
-	console.log("ADDED TIME SHEET");
+				if(err) {console.log(err); throw(err);}
+	      console.log("ADDED TIME SHEET");
+        console.log(raw)
+        UserModel.findOne({'email':email},function(err,user){
+            if(user){
+              var responseStr = JSON.stringify(user)
+              res.send(responseStr);
+            }
+        })
+				//res.send("ADDED TIME SHEET");
+      });
 })
 router.get('/timeSheets', function(req,res){
 	var email = req.body['email'];
-	email='kaushal@deck.in';
 	console.log("GETTING TIME SHEETS FORi "+email);
 		UserModel.findOne({'email':email},function(err,user){
 				if(user){
