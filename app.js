@@ -33,15 +33,21 @@ router.post('/employee', function(req,res){
 						res.end();
 					}else{
 						//employee doesnt exist. So add new employee
-            res.send("EMPLOYEE DOESNT EXIST. SO ADDING NEW EMPLOYEE")
 						var employee = new UserModel();
 		        employee.name= employeeName;
 						employee.email = email;
+            employee.timesheets=[];
 		        employee.save(function(err){
-		                if(err) throw err;
+		                if(err) {
+                      console.log("ERROR WHILE ADDING NEW EMPLOYEE");
+                      throw err;
+
+                    }
 		        				else {
-													res.send("ADDED NEW EMPLOEE NAME "+employeeName);
-													res.end();
+                          console.log("ADDED NEW EMPLOYEE "+employeeName);
+                          res.send("EMPLOYEE DOESNT EXIST. SO ADDING NEW EMPLOYEE")
+													//res.send();
+													//res.end();
 										}
 		        });
 					}
@@ -58,7 +64,10 @@ router.get('/employee', function(req,res){
 			res.send(responseStr);
 			res.end();
 		}else{
-			res.send("DIDNT FIND EMPLOYEE "+emp)
+      console.log("ERROR: EMPLOYEE NOT FOUND "+email);
+      var err ={"err":"Employee not found"};
+      var responseStr = JSON.stringify(err);
+			res.send(responseStr)
 			res.end();
 		}
 	})

@@ -2,7 +2,6 @@
 
 <head>
   <script src="moment.min.js"></script>
-  <script src="card-depth.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.0/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.0/JSXTransformer.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -27,6 +26,55 @@ var EmailForm = React.createClass({
       </form>);
   }
 })
+var Timesheet = React.createClass({
+
+  render: function(){
+    var sd = new moment(this.props.time_sheet.start_date);
+    var fsd = sd.format("MMM Do YYYY");
+    var ed = new moment(this.props.time_sheet.end_date);
+    var fed = ed.format("MMM Do YYYY");
+
+    console.log("FSD IS "+fsd);
+    return(
+      <div className={'w3-card-4'}>
+        <header className={"w3-container w3-blue"}>
+        <p> {fsd} TO {fed} </p>
+        </header>
+        <div className={"w3-container"}>
+        <p> {this.props.time_sheet.tasks} </p>
+        </div>
+    </div>
+    );
+  }
+})
+var UserTimesheets = React.createClass({
+
+    render: function(){
+      //get user object from state.data.
+      var divStyle = {
+        width: 500
+        };
+      console.log("RENDERING UserTimesheets")
+      if(this.props.timeSheet.timesheets.length>0){
+        timesheetNodes= this.props.timeSheet.timesheets.map(function (timesheet) {
+              return (
+                <div>
+                <Timesheet time_sheet={timesheet} />
+                <br />
+                </div>
+              );
+            });
+      }else{
+        timesheetNodes=<div> <h3> You have not filed any weekly status reports yet </h3></div>;
+      }
+
+       return (
+            <div style={divStyle}>
+              {timesheetNodes}
+            </div>
+          );
+    }
+})
 
 //This is a form to add time sheet. It has one text box and a button.
 
@@ -50,41 +98,6 @@ var AddTimesheet = React.createClass({
           <input type="submit" />
           </form>
         )
-    }
-})
-var Timesheet = React.createClass({
-
-  render: function(){
-    var sd = new moment(this.props.time_sheet.start_date);
-    var fsd = sd.format("MMM Do YYYY");
-    var ed = new moment(this.props.time_sheet.end_date);
-    var fed = ed.format("MMM Do YYYY");
-    console.log("FSD IS "+fsd);
-    return(<div>
-    <p> {fsd} TO {fed} </p>
-    <p> {this.props.time_sheet.tasks} </p>
-    </div>
-    );
-  }
-})
-var UserTimesheets = React.createClass({
-
-    render: function(){
-      //get user object from state.data.
-      console.log("RENDERING UserTimesheets")
-        timesheetNodes= this.props.timeSheet.timesheets.map(function (timesheet) {
-              return (
-                <div styleName="w3-card">
-                <Timesheet time_sheet={timesheet}>
-                </Timesheet>
-                </div>
-              );
-            });
-       return (
-            <div >
-              {timesheetNodes}
-            </div>
-          );
     }
 })
 //THis is the parent component of all other components so will have to the state.
@@ -116,11 +129,8 @@ var TimeSheet = React.createClass({
       type: 'GET',
       success: function(data) {
         console.log(data)
-        console.log("BEFORE DATA FROM SERVER");
-        console.log(this.state);
-        console.log("GOT DATA FROM SERVER");
-        this.setState({data: data});
-        console.log(this.state.data)
+        if(!data.err)
+          this.setState({data: data});
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
@@ -128,16 +138,39 @@ var TimeSheet = React.createClass({
     });
   },
   render: function(){
-    if(this.state.data.email=="")
-          return(<div> Hello Decksters!!! Enter your email to contine
-            <EmailForm getUserTimesheet={this.getTimeSheet}/>
-            </div>);
-    else
-          return(<div> Hello Decksters!!! Enter your email to contine
-            <EmailForm getUserTimesheet={this.getTimeSheet}/>
-            <p> Welcome {this.state.data.name} </p>
-            <AddTimesheet addUserTimesheet={this.addUserTimesheet} data={this.state.data}/>
-            <UserTimesheets timeSheet={this.state.data}/>
+    var divStyle1 = {}
+    var divStyle={}
+    if(this.state.data.email==""){
+      divStyle1 ={
+        align: 'center',
+        width:600,
+        margin:'0 auto'
+      }
+      divStyle = {
+          display: 'none'
+      }
+    }
+    else{
+      divStyle1 ={
+        display: 'none'
+      }
+      divStyle = {
+          align: 'center',
+          width:600,
+          margin:'0 auto'
+      }
+    }
+
+      return(<div>
+                <div style={divStyle1}>
+                  <p> Hello Decksters!!! Enter your email to contine </p>
+                  <EmailForm getUserTimesheet={this.getTimeSheet}/>
+                </div>
+                <div style={divStyle}>
+                    <p> Welcome {this.state.data.name} </p>
+                    <AddTimesheet addUserTimesheet={this.addUserTimesheet} data={this.state.data}/>
+                    <UserTimesheets timeSheet={this.state.data}/>
+                </div>
             </div>);
   }
 
