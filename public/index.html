@@ -33,6 +33,8 @@ var Timesheet = React.createClass({
     var fsd = sd.format("MMM Do YYYY");
     var ed = new moment(this.props.time_sheet.end_date);
     var fed = ed.format("MMM Do YYYY");
+    var tasks = this.props.time_sheet.tasks;
+
 
     console.log("FSD IS "+fsd);
     return(
@@ -41,7 +43,7 @@ var Timesheet = React.createClass({
         <p> {fsd} TO {fed} </p>
         </header>
         <div className={"w3-container"}>
-        <p> {this.props.time_sheet.tasks} </p>
+         {tasks}
         </div>
     </div>
     );
@@ -55,15 +57,18 @@ var UserTimesheets = React.createClass({
         width: 500
         };
       console.log("RENDERING UserTimesheets")
+      var timesheetNodes=[];
       if(this.props.timeSheet.timesheets.length>0){
-        timesheetNodes= this.props.timeSheet.timesheets.map(function (timesheet) {
-              return (
-                <div>
-                <Timesheet time_sheet={timesheet} />
-                <br />
-                </div>
-              );
-            });
+        console.log("THERE ARE "+this.props.timeSheet.timesheets.length+" TIMESHEETS");
+        var len = this.props.timeSheet.timesheets.length;
+        for(var i=len; i--;i >=0){
+          console.log("I is "+i);
+            var ts = this.props.timeSheet.timesheets[i];
+            timesheetNodes.push(  <div>
+              <Timesheet time_sheet={ts} />
+              <br />
+              </div>)
+        }
       }else{
         timesheetNodes=<div> <h3> You have not filed any weekly status reports yet </h3></div>;
       }
@@ -88,16 +93,19 @@ var AddTimesheet = React.createClass({
     render: function(){
       if(this.props.data.email==null || this.props.data.email=="")
         return(<div />);
-      else
-          return(
-          <form method="post" action="/rest/timeSheet" onSubmit={this.handleAddTimesheet}>
-          <input type="hidden" value={this.props.data.email} ref="email" />
-          <textarea placeholder="Enter last weeks tasks" ref="tasks" />
-          <br />
-          <br />
-          <input type="submit" />
-          </form>
-        )
+      else{
+        var TaStyle={ width:500, height:100}
+        return(
+        <form method="post" action="/rest/timeSheet" onSubmit={this.handleAddTimesheet}>
+        <input type="hidden" value={this.props.data.email} ref="email" />
+        <textarea style={TaStyle} placeholder="Enter last weeks tasks" ref="tasks" />
+        <br />
+        <br />
+        <input type="submit" />
+        </form>
+      )
+      }
+
     }
 })
 //THis is the parent component of all other components so will have to the state.
