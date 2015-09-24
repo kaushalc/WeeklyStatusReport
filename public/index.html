@@ -92,6 +92,7 @@ var AddTimesheet = React.createClass({
         e.preventDefault();
         var email = React.findDOMNode(this.refs.email).value.trim();//this.state.data.email;
         var tasks = React.findDOMNode(this.refs.tasks).value.trim();
+        React.findDOMNode(this.refs.tasks).value ="";
         this.props.addUserTimesheet(email,tasks);
     },
     render: function(){
