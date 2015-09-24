@@ -34,7 +34,11 @@ var Timesheet = React.createClass({
     var ed = new moment(this.props.time_sheet.end_date);
     var fed = ed.format("MMM Do YYYY");
     var tasks = this.props.time_sheet.tasks;
-
+    var tA = tasks.split("\n")
+    var spans=[];
+    for(var j=0; j< tA.length; j++){
+      spans.push(<p> {tA[j]} </p>)
+    }
 
     console.log("FSD IS "+fsd);
     return(
@@ -43,7 +47,7 @@ var Timesheet = React.createClass({
         <p> {fsd} TO {fed} </p>
         </header>
         <div className={"w3-container"}>
-         {tasks}
+         {spans}
         </div>
     </div>
     );
