@@ -2,6 +2,10 @@ var express = require('express');
 var connect = require('connect');
 var http = require('http');
 var mongoose = require('mongoose');
+var nodemailer = require('nodemailer');
+var moment = require('moment')
+var emailer = require('./emailer')
+
 var Schema = mongoose.Schema;
 var db = mongoose.connect('mongodb://localhost/timesheet');
 console.log("CONNECTED TO MONGO");
@@ -98,6 +102,17 @@ router.post('/timeSheet', function(req,res){
             if(user){
               var responseStr = JSON.stringify(user)
               res.send(responseStr);
+
+              var fsd = new moment(new Date(weekstart)).format("MMM Do YYYY");
+              var fed = new moment(new Date(weekend)).format("MMM Do YYYY");
+              var mailOptions = {
+                  from: 'support@deck.in', // sender address
+                  to: 'kaushal@deck.in', // list of receivers
+                  subject: 'Weekly status report  of '+email+" from  "+fsd+" TO "+fed, // Subject line
+                  text: taskDetails // plaintext body
+
+              };
+              emailer.sendEmail(null, nodemailer,mailOptions);
             }
         })
 				//res.send("ADDED TIME SHEET");
